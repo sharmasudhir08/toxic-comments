@@ -1,0 +1,10 @@
+recurrent,transformer,n_pvalues_combined,fisher_statistic,fisher_p,p_holm_9pairs,sig_0.05
+lstm,bert,18,1.987935,1.0,1.0,False
+lstm,distilbert,18,2.339601,1.0,1.0,False
+lstm,roberta,18,1.960293,1.0,1.0,False
+bilstm,bert,18,2.183066,1.0,1.0,False
+bilstm,distilbert,18,2.369673,1.0,1.0,False
+bilstm,roberta,18,2.565147,1.0,1.0,False
+gru,bert,18,2.010409,1.0,1.0,False
+gru,distilbert,18,2.720045,1.0,1.0,False
+gru,roberta,18,2.601167,1.0,1.0,False

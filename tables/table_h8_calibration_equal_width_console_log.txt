@@ -1,0 +1,44 @@
+======================================================================
+CALIBRATION ANALYSIS -- all six models, both families
+======================================================================
+
+Seed completeness:
+  lstm         seeds=[42, 43, 44]
+  bilstm       seeds=[42, 43, 44]
+  gru          seeds=[42, 43, 44]
+  bert         seeds=[42, 43, 44]
+  distilbert   seeds=[42, 43, 44]
+  roberta      seeds=[42, 43, 44]
+
+=== Macro ECE / Brier, mean +/- SD over available seeds ===
+  lstm         ECE=0.0400+/-0.0107  Brier=0.0335+/-0.0021
+  bilstm       ECE=0.0389+/-0.0026  Brier=0.0339+/-0.0016
+  gru          ECE=0.0359+/-0.0028  Brier=0.0323+/-0.0005
+  bert         ECE=0.0325+/-0.0028  Brier=0.0301+/-0.0002
+  distilbert   ECE=0.0356+/-0.0039  Brier=0.0304+/-0.0004
+  roberta      ECE=0.0360+/-0.0062  Brier=0.0316+/-0.0031
+
+=== Per-label ECE: minority vs frequent, per model (mean over available seeds) ===
+  lstm         minority_ECE=0.0168  frequent_ECE=0.0632  ratio=0.27x
+  bilstm       minority_ECE=0.0147  frequent_ECE=0.0631  ratio=0.23x
+  gru          minority_ECE=0.0136  frequent_ECE=0.0583  ratio=0.23x
+  bert         minority_ECE=0.0117  frequent_ECE=0.0533  ratio=0.22x
+  distilbert   minority_ECE=0.0139  frequent_ECE=0.0573  ratio=0.24x
+  roberta      minority_ECE=0.0156  frequent_ECE=0.0564  ratio=0.28x
+
+=== Minority vs frequent ECE: one-sided paired t-test (minority < frequent), per model ===
+    (models with <2 seeds cannot be tested -- reported as n/a, not estimated)
+  lstm         diff(minority-frequent)=-0.0464  p=0.0026  p_Holm=0.0052
+  bilstm       diff(minority-frequent)=-0.0483  p=0.0003  p_Holm=0.0013
+  gru          diff(minority-frequent)=-0.0448  p=0.0006  p_Holm=0.0018
+  bert         diff(minority-frequent)=-0.0416  p=0.0001  p_Holm=0.0004
+  distilbert   diff(minority-frequent)=-0.0433  p=0.0001  p_Holm=0.0005
+  roberta      diff(minority-frequent)=-0.0408  p=0.0107  p_Holm=0.0107
+
+=== Does the best-F1 model match the best-calibrated model? ===
+  lstm         F1_macro_M=0.5738  ECE=0.0400
+  bilstm       F1_macro_M=0.5849  ECE=0.0389
+  gru          F1_macro_M=0.5831  ECE=0.0359
+  bert         F1_macro_M=0.6235  ECE=0.0325
+  distilbert   F1_macro_M=0.6226  ECE=0.0356
+  roberta      F1_macro_M=0.6144  ECE=0.0360

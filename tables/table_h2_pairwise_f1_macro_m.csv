@@ -1,0 +1,10 @@
+recurrent,transformer,metric,diff_trans_minus_rec,p_raw,p_holm_9pairs,sig_0.05
+lstm,bert,f1_macro_m,0.04968,0.00229,0.01601,True
+lstm,distilbert,f1_macro_m,0.04877,0.0062,0.01859,True
+lstm,roberta,f1_macro_m,0.04058,0.00272,0.01611,True
+bilstm,bert,f1_macro_m,0.03862,0.00269,0.01611,True
+bilstm,distilbert,f1_macro_m,0.03771,0.00424,0.01696,True
+bilstm,roberta,f1_macro_m,0.02951,0.03525,0.04915,True
+gru,bert,f1_macro_m,0.04041,0.00109,0.00978,True
+gru,distilbert,f1_macro_m,0.0395,0.00178,0.0142,True
+gru,roberta,f1_macro_m,0.0313,0.02457,0.04915,True

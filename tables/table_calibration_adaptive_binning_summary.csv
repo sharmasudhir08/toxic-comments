@@ -1,0 +1,7 @@
+model,macro_ece_adaptive_mean,macro_ece_adaptive_sd,macro_ece_equal_width_table4
+lstm,0.039167,0.011333,0.04
+bilstm,0.03893,0.003428,0.0389
+gru,0.035803,0.003771,0.0359
+bert,0.032337,0.003083,0.0325
+distilbert,0.035385,0.0045,0.0356
+roberta,0.036045,0.006172,0.036

@@ -1,0 +1,5 @@
+metric,recurrent_mean,transformer_mean,diff,direction,welch_t_3v3_p,exact_permutation_p,permutation_splits_total,welch_18runs_WRONG_unit_p
+f1_macro_m,0.5806,0.62016,0.03957,transformer higher,0.00103,0.1,10,0.0
+roc_auc_macro,0.97962,0.98309,0.00347,transformer higher,0.00554,0.1,10,0.00041
+pr_auc_macro,0.6137,0.65619,0.04249,transformer higher,0.02955,0.1,10,1e-05
+ece_macro,0.03828,0.0347,-0.00358,recurrent higher,0.09418,0.2,10,0.16365

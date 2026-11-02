@@ -1,0 +1,7 @@
+model,minority_ece_adaptive_mean,frequent_ece_adaptive_mean,p_one_sided,p_holm,sig_0.05
+lstm,0.01681,0.061524,0.003824,0.007648,True
+bilstm,0.014911,0.062949,0.00073,0.002921,True
+gru,0.013565,0.05804,0.001046,0.003138,True
+bert,0.01179,0.052885,0.000147,0.000733,True
+distilbert,0.013991,0.056779,8.4e-05,0.000504,True
+roberta,0.015621,0.056469,0.009893,0.009893,True

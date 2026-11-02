@@ -1,0 +1,41 @@
+======================================================================
+LENGTH-ROBUSTNESS ANALYSIS -- discriminative metrics + calibration
+======================================================================
+
+Test set: official Jigsaw test set (test.csv + test_labels.csv, scored rows only) | n = 63662
+
+=== Length-bin sizes and label prevalence ===
+  <=25       n= 25334  toxic_rate=0.153  threat_rate=0.0049
+  26-50      n= 15188  toxic_rate=0.076  threat_rate=0.0030
+  51-100     n= 12596  toxic_rate=0.050  threat_rate=0.0014
+  101-200    n=  6764  toxic_rate=0.028  threat_rate=0.0012
+  >200       n=  3780  toxic_rate=0.051  threat_rate=0.0037
+
+Seeds used per model: {'lstm': [42, 43, 44], 'bilstm': [42, 43, 44], 'gru': [42, 43, 44], 'bert': [42, 43, 44], 'distilbert': [42, 43, 44], 'roberta': [42, 43, 44]}
+
+=== F1(M) per model per length bin, mean over available seeds ===
+Model              <=25      26-50     51-100    101-200       >200
+lstm              0.548      0.524      0.465      0.426      0.541 
+bilstm            0.549      0.533      0.474      0.428      0.547 
+gru               0.553      0.532      0.474      0.435      0.558 
+bert              0.611      0.577      0.518      0.460      0.605 
+distilbert        0.595      0.568      0.508      0.464      0.609 
+roberta           0.585      0.560      0.498      0.443      0.590 
+
+=== ROC-AUC macro per model per length bin, mean over available seeds ===
+Model              <=25      26-50     51-100    101-200       >200
+lstm             0.9730     0.9801     0.9828     0.9809     0.9786 
+bilstm           0.9745     0.9814     0.9822     0.9828     0.9790 
+gru              0.9745     0.9807     0.9833     0.9828     0.9793 
+bert             0.9790     0.9841     0.9848     0.9747     0.9735 
+distilbert       0.9808     0.9854     0.9845     0.9778     0.9780 
+roberta          0.9784     0.9854     0.9854     0.9772     0.9770 
+
+=== Macro ECE per model per length bin, mean over available seeds (NEW: calibration by length) ===
+Model              <=25      26-50     51-100    101-200       >200
+lstm             0.0549     0.0338     0.0276     0.0264     0.0311 
+bilstm           0.0546     0.0311     0.0265     0.0270     0.0301 
+gru              0.0498     0.0296     0.0249     0.0245     0.0280 
+bert             0.0452     0.0272     0.0221     0.0221     0.0231 
+distilbert       0.0505     0.0295     0.0235     0.0232     0.0232 
+roberta          0.0519     0.0291     0.0233     0.0228     0.0243 

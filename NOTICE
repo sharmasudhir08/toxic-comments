@@ -1,0 +1,16 @@
+toxic-comments
+Copyright 2026 Prof. (Dr.) Sudhir Kumar Sharma, Sneha Vasishth.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not
+use this code except in compliance with the License. A copy of the License
+is in the LICENSE file at the root of this repository.
+
+This repository accompanies a manuscript under peer review, comparing six
+models (LSTM, Bi-LSTM, GRU; BERT, DistilBERT, RoBERTa) on multi-label toxic
+comment classification. It is made available so reviewers and readers can
+verify every reported number, table, and figure against the saved
+experimental artifacts, without retraining.
+
+Dataset notice: this repository does not redistribute the Jigsaw Toxic
+Comment Classification Challenge dataset. See README.md for the Kaggle
+source link.
