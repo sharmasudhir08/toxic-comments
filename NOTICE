@@ -7,9 +7,8 @@ is in the LICENSE file at the root of this repository.
 
 This repository accompanies a manuscript under peer review, comparing six
 models (LSTM, Bi-LSTM, GRU; BERT, DistilBERT, RoBERTa) on multi-label toxic
-comment classification. It is made available so reviewers and readers can
-verify every reported number, table, and figure against the saved
-experimental artifacts, without retraining.
+comment classification. It is shared so others can verify the results,
+reuse the code, or build on this work.
 
 Dataset notice: this repository does not redistribute the Jigsaw Toxic
 Comment Classification Challenge dataset. See README.md for the Kaggle
