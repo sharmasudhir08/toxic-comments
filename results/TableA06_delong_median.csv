@@ -1,0 +1,10 @@
+recurrent,transformer,median_p_across_labels,p_holm_9pairs,sig_0.05
+bilstm,bert,0.0039,0.01599,True
+bilstm,distilbert,8e-05,0.00064,True
+bilstm,roberta,0.07159,0.07159,False
+gru,bert,0.00572,0.01599,True
+gru,distilbert,0.00014,0.00087,True
+gru,roberta,0.00402,0.01599,True
+lstm,bert,0.00012,0.00087,True
+lstm,distilbert,6e-05,0.00057,True
+lstm,roberta,0.0032,0.01599,True

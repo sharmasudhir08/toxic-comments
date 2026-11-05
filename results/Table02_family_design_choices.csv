@@ -1,0 +1,7 @@
+﻿Item,Recurrent (LSTM / Bi-LSTM / GRU),Transformers (BERT / DistilBERT / RoBERTa)
+Input text,"Deep cleaning: lower-cased, URLs and non-alphabetic characters removed",No cleaning: raw comment text
+Tokens / embedding,"NLTK tokens; FastText crawl-300d-2M, fine-tuned; spatial dropout 0.3","WordPiece/BPE (Byte-Pair Encoding); pretrained 768-d, fine-tuned"
+Network,"1 layer x 128 units; attention + max + mean pooling; Dense(64, ReLU) + Dropout 0.2; Dense(6)","12 / 6 / 12 layers, hidden 768, standard classification head"
+Optimiser,Adam 1e-3 + ReduceLROnPlateau,"AdamW 2e-5, 6% warm-up, linear decay, weight decay 0.01"
+Batch / max epochs,128 / 20,32 / 4
+Early-stopping patience,4,1

@@ -1,68 +1,71 @@
-# Traceability
+# Traceability: paper item → result file → script
 
-Every number, table, and figure in the manuscript traces to a file in this repository. Nothing is
-hand-typed or estimated. This document maps each claim to its source.
+Every number in `results/` is produced by exactly one script in `src/` (or `generate_results.py`)
+reading already-saved model outputs. No number here is hand-typed or hand-edited. See
+`results/MAPPING.csv` for the same information as a machine-readable CSV.
 
-## Raw results
-
-`results_proposed/runs/<model>_p{3,4}/seed_{42,43,44}/metrics.json` — per-run metrics (F1, ROC-AUC,
-MCC, ECE, Brier, per-label breakdowns), saved immediately after each training run completes.
-`p3` = default (0.5) threshold, `p4` = validation-tuned thresholds. `<model>` is one of
-{lstm, bilstm, gru, bert, distilbert, roberta}. Not included in this repository (training outputs
-only; regenerate by training, see README.md's "Reproduction" section); the derived CSVs below are.
-
-`results_proposed/runs/<model>_p{3,4}/seed_<seed>/test_outputs.npz` — saved predicted probabilities
-and true labels for the full test set, one array per run. Used by every analysis script below
-without re-running inference.
-
-One correction, applied consistently: BERT seed 42's raw training time was inflated by GPU
-contention with a concurrent job on the development machine. Every reported training time for
-BERT uses the mean of seeds 43 and 44 (76.2 min) instead; no quality metric (F1, AUC, etc.) for
-seed 42 is affected.
-
-## Derived tables and figures
-
-| Script | Produces | What it covers |
+| Paper item | Result file | Script |
 |---|---|---|
-| `src/family_comparison.py` | `table_h1_family_comparison.csv` | Family-level (recurrent vs. transformer) comparison |
-| `src/h2_full_methods.py` | `table_h2_tukey_hsd_*.csv`, `table_h2_delong_summary.csv`, `table_h2_bootstrap.csv` | Cross-family pairwise significance: Tukey HSD, DeLong's test, paired bootstrap |
-| `src/h2_delong_fisher.py` | `table_h2_delong_fisher.csv` | DeLong's test, Fisher-combined across labels (robustness check on the method above) |
-| `src/h2_within_family_check.py` | `table_h2_within_family_tukey_*.csv` | Within-family pairwise significance (3 recurrent-internal + 3 transformer-internal pairs) |
-| `src/h6_within_recurrent_ece_check.py` | console log only | Within-recurrent-family calibration (ECE) pairwise test |
-| `src/calibration_analysis.py` | `table_h8_calibration_equal_width.csv` | Macro/per-label ECE and Brier score, minority- vs. frequent-label calibration |
-| `src/calibration_adaptive_binning.py` | `table_calibration_adaptive_binning_*.csv`, `table_h8_adaptive_binning_retest.csv` | Calibration robustness check: equal-mass binning instead of equal-width |
-| `src/seed_stability.py` | console log only | Seed-to-seed variability (coefficient of variation) of discrimination vs. calibration metrics |
-| `src/single_vs_multi_seed.py` | `table_h5_single_vs_multi_seed.csv` | Whether single-seed and multi-seed pairwise conclusions agree |
-| `src/length_robustness.py` | console log only | Performance by comment-length bin |
-| `src/label_distribution.py` | printed table | Label distribution, computed independently from the raw data files |
-| `src/duplicate_audit.py` | — | Near-duplicate audit between train and test splits |
-| `src/recompute_on_correctly_screened_test.py` | — | Headline metrics recomputed on an alternative, more strictly screened test set (see note below) |
-| `src/maslej_baselines.py`, `src/paper_baselines.py` | — | Published comparator results, used for benchmark comparison tables |
+| Table 1 (label distribution) | `results/Table01_label_distribution.csv` | computed directly from the raw Kaggle data files, no model output needed |
+| Table 2 (family-specific settings) | `results/Table02_family_design_choices.csv` | transcribed from the manuscript (settings, not computed) |
+| Table 3 (overall perf., Acc/F1/AUC) | `results/Table03_overall_performance_acc_f1_auc.csv` | `generate_results.py --results_dir results_proposed` |
+| Table 4 (overall perf., MCC/ECE/Brier/time) | `results/Table04_overall_performance_mcc_ece_brier_time.csv` | `generate_results.py --results_dir results_proposed` (same source file as Table 3) |
+| Table 5 (per-label F1) | `results/Table05_per_label_f1.csv` | `generate_results.py --results_dir results_proposed` |
+| Table 6 (H1 primary, nested ANOVA) | `results/Table06_h1_nested_anova_primary.csv` | `python -m src.h1_nested_anova_paper3` |
+| Table 6 (H1 secondary, Welch/permutation) | `results/Table06_h1_welch_permutation_secondary.csv` | `python -m src.family_comparison` |
+| Table 7 (H3a/H3b vs. benchmark, tuned) | `results/Table07_h3_benchmark_tuned.csv` | `python -m src.h3_h4_paper3` |
+| Table 8 (H7 per-bin nested ANOVA) | `results/Table08_h7_per_bin_nested_anova.csv` | `python -m src.h7_length_control_nested_anova_paper3` |
+| Table 9 (H8 Brier Skill Score) | `results/Table09_h8_brier_skill_score.csv` | `python -m src.e1_prevalence_normalized_calibration_paper3` |
+| Table 10 (outcome synthesis) | — (collects Tables 3-9, A3-A14; no separate source) | — |
+| Table A1 (hyperparameters) | `results/TableA01_hyperparameters.csv` | transcribed from the manuscript (settings, not computed) |
+| Table A2 (hardware/software) | `results/TableA02_environment.csv` | transcribed from the manuscript (settings, not computed) |
+| Table A3 (full 48-row benchmark) | `results/TableA03_benchmark_48row_full.csv` | `python -m src.h3_h4_paper3` (per-row detail), pooled Holm recomputed across the 48-test family |
+| Table A4 (Tukey HSD, ROC-AUC) | `results/TableA04_tukey_hsd_roc_auc.csv` | `python -m src.h2_full_methods` |
+| Table A5 (Tukey HSD, F1(M)) | `results/TableA05_tukey_hsd_f1m.csv` | `python -m src.h2_full_methods` |
+| Table A6 (DeLong, median p) | `results/TableA06_delong_median.csv` | `python -m src.h2_full_methods` |
+| Table A7 (DeLong, Fisher-combined) | `results/TableA07_delong_fisher_combined.csv` | `python -m src.h2_delong_fisher_corrected` |
+| Table A8 (paired bootstrap) | `results/TableA08_paired_bootstrap.csv` | `python -m src.h2_full_methods` |
+| Table A9 (tuned thresholds) | `results/TableA09_tuned_thresholds.csv` | `generate_results.py --results_dir results_proposed` |
+| Table A10 (per-label margin) | `results/TableA10_per_label_margin_vs_benchmark.csv` | `generate_results.py --results_dir results_proposed` |
+| Table A11 (H8 adaptive-binning retest) | `results/TableA11_h8_adaptive_binning_retest.csv` | `python -m src.calibration_adaptive_binning` |
+| Table A12 (H5 single-vs-multi-seed) | `results/TableA12_h5_single_vs_multi_seed.csv` | `python -m src.single_vs_multi_seed` |
+| Table A12 (H5 paired permutation) | `results/TableA12_h5_paired_permutation.csv` | not currently a standalone script in this repository — see note below |
+| Table A13 (H9 CV ratios) | `results/TableA13_h9_cv_ratios.csv` | base CV values from `python -m src.seed_stability`; the ratio columns are not currently a standalone script in this repository — see note below |
+| Table A14 (H10 truncation) | `results/TableA14_h10_truncation.csv` | `python -m src.check_truncation_mismatch_paper3` |
+| Fig. 1 (workflow) | `figures/Fig1.png` | extracted directly from the final manuscript; no source script in this repository |
+| Fig. 2 (recurrent architecture) | `figures/Fig2.png` | extracted directly from the final manuscript; no source script in this repository |
+| Fig. 3 (transformer architecture) | `figures/Fig3.png` | extracted directly from the final manuscript; no source script in this repository |
+| Fig. 4 (overall performance) | `figures/Fig4.png` | extracted directly from the final manuscript; no source script in this repository |
+| Fig. 5 (calibration + BSS) | `figures/Fig5.png` | extracted directly from the final manuscript; no source script in this repository |
+| Fig. 6 (length robustness) | `figures/Fig6.png` | extracted directly from the final manuscript; no source script in this repository |
 
-CSVs and console logs for every script above are in `tables/`. Figures (architecture diagrams and
-result plots) are in `figures/`.
+## Honest gaps
 
-## Notes for correctly interpreting these results
+Three result files currently have saved data but no standalone, re-runnable script in this
+repository:
 
-- **Test-set definition.** All results in this repository use a 63,662-comment test set (a
-  short-comment screen only). A stricter, additionally near-duplicate-screened 61,701-comment set
-  was also evaluated (`src/recompute_on_correctly_screened_test.py`, no retraining): the difference
-  is small and does not change any headline conclusion (macro-F1(M) shifts by 0.0008-0.0016,
-  ROC-AUC by 0.0004-0.0006, ECE by 0.0005-0.0006 across all six models — an order of magnitude
-  smaller than seed-to-seed variance).
-- **H2 (cross-family significance on ROC-AUC) — three methods disagree, reported directly rather
-  than resolved by picking one.** Tukey HSD finds 1 of 9 cross-family pairs significant; DeLong's
-  test (median p-value across labels) finds 0 of 9; a paired bootstrap over individual test
-  comments (no collapsing across labels) finds 9 of 9 significant. The manuscript's interpretation
-  is that the first two methods are underpowered relative to the bootstrap, since they each
-  collapse the full test set's evidence down to very few values before testing. On the secondary
-  metric F1(M), all three methods agree (9 of 9 significant).
-- **Calibration binning.** ECE is reported with equal-width bins by default. An equal-mass
-  (quantile) binning alternative was also tested as a robustness check and gives materially the
-  same result (`src/calibration_adaptive_binning.py`).
+- **`Table 8 (H7 per-bin nested ANOVA)`**, specifically the `p_holm_10tests` and `sig_holm_primary`
+  columns — `src/h7_length_control_nested_anova_paper3.py` reproduces all other columns (bin,
+  n_comments, metric, recurrent_mean, transformer_mean, diff, F_family_1_4, p_family_1_4) exactly;
+  verified by re-running it and diffing the output against `results/Table08_h7_per_bin_nested_anova.csv`
+  (2026-11-05). The two Holm-correction columns are present in the saved CSV but are not produced
+  by the current version of that script, and no other script in this repository computes them.
+- **`Table A12 (H5 paired permutation)`** — the exact-permutation robustness check on seed-averaged
+  correctness. The underlying McNemar+Fisher test (`src/single_vs_multi_seed.py`) is included and
+  reproducible; the permutation check itself was computed with ad-hoc code during analysis and has
+  not yet been packaged as a standalone script.
+- **`Table A13 (H9 CV ratios)`**, specifically the `ece_over_f1_ratio` and `brier_over_auc_ratio`
+  columns — `src/seed_stability.py` computes and prints the underlying CV(F1), CV(AUC), CV(ECE)
+  and CV(Brier) values (reproducible), but the ratio columns themselves were computed with ad-hoc
+  code, not a saved script.
 
-## Not included
+Both are flagged here rather than silently omitted or backed by a script written after the fact
+that might not exactly match the saved numbers. The raw CV values in `src/seed_stability.py`'s
+output do match the saved CSV (verify by running it and comparing the printed percentages).
 
-Trained model checkpoints are not included. Raw per-seed training outputs
-(`results_proposed/runs/`) are not included; this repository ships only the derived, aggregated
-CSVs and console logs built from them, under `tables/`.
+## No reproduction claim without the saved model outputs
+
+None of the scripts above can be run without the saved per-model, per-seed test-set probabilities
+(and, for H1, the near-duplicate screen mask). These are not included in this repository (see
+`README.md`); request them from the authors to actually execute the reproduction steps above. File
+integrity for everything in `results/` can still be checked against `SHASUMS` without them.

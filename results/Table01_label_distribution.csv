@@ -1,0 +1,10 @@
+label,train_n,train_pct,test_n,test_pct
+toxic,15294,9.58,6090,9.52
+severe_toxic,1595,1.0,367,0.57
+obscene,8449,5.29,3691,5.77
+threat,478,0.3,211,0.33
+insult,7877,4.94,3427,5.36
+identity_hate,1405,0.88,712,1.11
+no_label,143346,89.83,57735,90.24
+ge_2_labels,9865,6.18,4401,6.88
+total,159571,100.0,63978,100.0

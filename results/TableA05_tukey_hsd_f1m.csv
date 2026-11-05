@@ -1,0 +1,10 @@
+group1,group2,meandiff,p-adj,lower,upper,reject,p_holm_9pairs,sig_tukey_holm_primary,sig_plain_tukey_sensitivity
+bert,bilstm,-0.0386,0.0001,-0.0551,-0.0221,True,0.0004,True,True
+bert,gru,-0.0404,0.0,-0.0569,-0.0239,True,0.0,True,True
+bert,lstm,-0.0497,0.0,-0.0662,-0.0332,True,0.0,True,True
+bilstm,distilbert,0.0377,0.0001,0.0212,0.0542,True,0.0004,True,True
+bilstm,roberta,0.0295,0.0007,0.013,0.046,True,0.0008,True,True
+distilbert,gru,-0.0395,0.0,-0.056,-0.023,True,0.0,True,True
+distilbert,lstm,-0.0488,0.0,-0.0653,-0.0323,True,0.0,True,True
+gru,roberta,0.0313,0.0004,0.0148,0.0478,True,0.0008,True,True
+lstm,roberta,0.0406,0.0,0.0241,0.0571,True,0.0,True,True

@@ -1,0 +1,13 @@
+﻿Setting,LSTM / Bi-LSTM / GRU,BERT / DistilBERT / RoBERTa
+Max sequence length,128 words,128 subword tokens
+Embedding / pretrained weights,"FastText crawl-300d-2M, fine-tuned","Model's own pretrained checkpoint, fully fine-tuned"
+Output layer,6 sigmoid units,6 sigmoid units
+Loss,"Class-weighted BCE (sqrt neg:pos ratio, capped 10)","Class-weighted BCE (sqrt neg:pos ratio, capped 10)"
+Optimiser,"Adam, lr 1e-3, ReduceLROnPlateau","AdamW, lr 2e-5, 6% warm-up, linear decay, weight decay 0.01"
+Batch size,128,32
+Max epochs / patience,20 / 4,4 / 1
+Model selection,"Best validation macro-F1 epoch, weights restored","Best validation macro-F1 epoch, weights restored"
+Thresholds reported,"0.5 and per-label validation-tuned (grid 0.05–0.95, step 0.01)","0.5 and per-label validation-tuned (grid 0.05–0.95, step 0.01)"
+Seeds,"42, 43, 44 (initialisation, data order, dropout)","42, 43, 44 (initialisation, data order, dropout)"
+Train / validation split,"143,465 / 15,941 (90/10 of the screened training pool, per seed)","143,465 / 15,941 (90/10 of the screened training pool, per seed)"
+Test set,"63,662 comments (short-comment screen only, Sec. 3.1) (H1's nested-ANOVA primary test additionally applies the near-duplicate screen: 61,701 comments, Sec. 3.1)","63,662 comments (short-comment screen only, Sec. 3.1) (H1's nested-ANOVA primary test additionally applies the near-duplicate screen: 61,701 comments, Sec. 3.1)"

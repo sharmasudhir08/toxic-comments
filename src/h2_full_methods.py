@@ -80,8 +80,18 @@ def _compute_midrank(x):
     return T2
 
 
-def delong_test(probs_a, probs_b, y_true):
-    """Two-sided DeLong test for two correlated ROC-AUC estimates on the same binary labels."""
+def delong_test_buggy(probs_a, probs_b, y_true):
+    """ORIGINAL implementation -- kept for the audit trail only. DO NOT USE.
+
+    Confirmed buggy 4 Nov 2026: `tz` is computed on `preds[r]` in its original, unsorted-by-label
+    order, but the downstream aucs/v01/v10 formulas (the standard "fast DeLong" algorithm, Sun &
+    Xu 2014) require `tz` to be computed on predictions already grouped with all positive-class
+    examples first, then all negative-class examples. That grouping step is missing here, so the
+    AUC and variance estimate are silently corrupted. Verified against sklearn's roc_auc_score on
+    all 162 (pair, seed, label) combinations of this project's own saved predictions -- see
+    scripts/verify_delong_vs_sklearn_paper3.py. Same bug, same fix, as the Mac project's
+    (independent, sibling) study found on 3 Nov 2026.
+    """
     pos = y_true == 1
     neg = y_true == 0
     if pos.sum() == 0 or neg.sum() == 0:
@@ -98,6 +108,48 @@ def delong_test(probs_a, probs_b, y_true):
         tx[r] = _compute_midrank(pos_preds[r])
         ty[r] = _compute_midrank(neg_preds[r])
         tz[r] = _compute_midrank(preds[r])
+    aucs = tz[:, :m].sum(axis=1) / m / n - float(m + 1) / 2.0 / n
+    v01 = (tz[:, :m] - tx[:, :]) / n
+    v10 = 1.0 - (tz[:, m:] - ty[:, :]) / m
+    sx = np.cov(v01)
+    sy = np.cov(v10)
+    delongcov = sx / m + sy / n
+    ld = np.array([[1, -1]])
+    var = ld.dot(delongcov).dot(ld.T)
+    auc_diff = aucs[0] - aucs[1]
+    if var[0, 0] <= 0:
+        return auc_diff, np.nan, np.nan
+    z = auc_diff / np.sqrt(var[0, 0])
+    p = 2 * stats.norm.sf(abs(z))
+    return auc_diff, z, p
+
+
+def delong_test(probs_a, probs_b, y_true):
+    """Two-sided DeLong test for two correlated ROC-AUC estimates on the same binary labels.
+
+    FIXED 4 Nov 2026 (Category A technical fix): predictions are now explicitly grouped with
+    positive-class examples first, then negative-class examples, before the combined midrank `tz`
+    is computed -- required by the aucs/v01/v10 formulas below. See `delong_test_buggy` above for
+    the original implementation and the bug description. Pre-registered aggregation rules (median
+    across labels, then seeds; Holm correction) are unchanged by this fix.
+    """
+    pos = y_true == 1
+    neg = y_true == 0
+    if pos.sum() == 0 or neg.sum() == 0:
+        return np.nan, np.nan, np.nan
+    preds = np.vstack([probs_a, probs_b])
+    m, n = pos.sum(), neg.sum()
+    k = 2
+    pos_preds = preds[:, pos]
+    neg_preds = preds[:, neg]
+    grouped_preds = np.concatenate([pos_preds, neg_preds], axis=1)  # positives first, then negatives
+    tx = np.empty([k, m])
+    ty = np.empty([k, n])
+    tz = np.empty([k, m + n])
+    for r in range(k):
+        tx[r] = _compute_midrank(pos_preds[r])
+        ty[r] = _compute_midrank(neg_preds[r])
+        tz[r] = _compute_midrank(grouped_preds[r])
     aucs = tz[:, :m].sum(axis=1) / m / n - float(m + 1) / 2.0 / n
     v01 = (tz[:, :m] - tx[:, :]) / n
     v10 = 1.0 - (tz[:, m:] - ty[:, :]) / m
@@ -171,14 +223,31 @@ def main():
 
     print("\n--- 1. One-way ANOVA + Tukey HSD (macro ROC-AUC) ---")
     anova_p, tukey_df = tukey_hsd("roc_auc_macro")
+    # FIX (4 Nov 2026, PAPER3_CORRECTIONS.md item A3): Paper-3-DC.docm Sec. 3.7 and
+    # pre_registration.md Sec. 4.1 both specify Holm's correction over the 9 pairs; Tukey's own
+    # p-adj alone (statsmodels' `reject` column) was being reported as if that were already the
+    # Holm-corrected result. PRIMARY = Tukey+Holm; plain Tukey kept as a labelled sensitivity
+    # analysis only, matching the Mac project's own resolution of the identical bug.
+    tukey_df["p-adj"] = tukey_df["p-adj"].astype(float)
+    tukey_df["p_holm_9pairs"] = holm(tukey_df["p-adj"].tolist())
+    tukey_df["sig_tukey_holm_primary"] = tukey_df["p_holm_9pairs"] < 0.05
+    tukey_df["sig_plain_tukey_sensitivity"] = tukey_df["reject"]
     print(f"ANOVA p (6 models) = {anova_p:.5f}")
     print(tukey_df.to_string(index=False))
+    print(f"PRIMARY (Tukey+Holm): {int(tukey_df['sig_tukey_holm_primary'].sum())}/9 significant; "
+          f"SENSITIVITY (plain Tukey): {int(tukey_df['sig_plain_tukey_sensitivity'].sum())}/9")
     tukey_df.to_csv("results_proposed/report/table_h2_tukey_hsd_auc.csv", index=False)
 
     print("\n--- 1b. One-way ANOVA + Tukey HSD (macro-F1(M), secondary) ---")
     anova_p_f1, tukey_df_f1 = tukey_hsd("f1_macro_m")
+    tukey_df_f1["p-adj"] = tukey_df_f1["p-adj"].astype(float)
+    tukey_df_f1["p_holm_9pairs"] = holm(tukey_df_f1["p-adj"].tolist())
+    tukey_df_f1["sig_tukey_holm_primary"] = tukey_df_f1["p_holm_9pairs"] < 0.05
+    tukey_df_f1["sig_plain_tukey_sensitivity"] = tukey_df_f1["reject"]
     print(f"ANOVA p (6 models) = {anova_p_f1:.5f}")
     print(tukey_df_f1.to_string(index=False))
+    print(f"PRIMARY (Tukey+Holm): {int(tukey_df_f1['sig_tukey_holm_primary'].sum())}/9 significant; "
+          f"SENSITIVITY (plain Tukey): {int(tukey_df_f1['sig_plain_tukey_sensitivity'].sum())}/9")
     tukey_df_f1.to_csv("results_proposed/report/table_h2_tukey_hsd_f1m.csv", index=False)
 
     print("\n--- 2. DeLong's test per label, median p over 3 seeds ---")

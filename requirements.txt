@@ -1,14 +1,6 @@
-# Exact versions tested on the project's development machine (NVIDIA RTX 3050 Laptop, 4GB VRAM,
-# driver supports CUDA <=12.7, Python 3.12.4). For an exact reproduction, install these versions;
-# for general use, newer compatible versions will likely also work.
-#
-# GPU: install torch with a CUDA build BEFORE this file, e.g.:
-#   pip install torch==2.14.0 --index-url https://download.pytorch.org/whl/cu126
-# Plain `pip install -r requirements.txt` after that will not downgrade it to CPU as long as the
-# version below is already satisfied. Verify with: python -c "import torch; print(torch.cuda.is_available())"
-torch==2.14.0
-transformers==5.17.0
-accelerate==1.15.0
+# Exact versions used to produce the reported results (Python 3.12.4). This reviewer-check
+# package contains statistical analysis scripts only (no model training or inference), so no
+# deep-learning framework (torch/transformers) is required to run anything here.
 scikit-learn==1.9.1
 scipy==1.18.1
 statsmodels==0.15.0
@@ -16,4 +8,4 @@ pandas==3.0.6
 numpy==2.5.3
 matplotlib==3.11.2
 seaborn==0.13.2
-nltk==3.10.4              # recurrent models: word_tokenize
+nltk==3.10.4              # H10 truncation check: word_tokenize

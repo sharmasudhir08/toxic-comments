@@ -1,0 +1,17 @@
+﻿Component,Value
+GPU,"NVIDIA GeForce RTX 3050 Laptop GPU, 4 GB VRAM"
+CPU,12th Gen Intel Core i7-12700H
+RAM,16 GB
+CUDA,12.6
+Python,3.12.4
+Torch,2.14.0+cu126
+transformers (Hugging Face),5.17.0
+accelerate,1.15.0
+scikit-learn,1.9.1
+Scipy,1.18.1
+statsmodels,0.15.0
+pandas,3.0.6
+numpy,2.5.3
+Nltk,3.10.4
+matplotlib,3.11.2
+Seaborn,0.13.2

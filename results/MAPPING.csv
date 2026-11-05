@@ -1,0 +1,27 @@
+paper_item,result_file,source_filename_in_results_v2,description
+Table 1,Table01_label_distribution.csv,table1_label_distribution.csv,Official Jigsaw train/test label distribution
+Table 2,Table02_family_design_choices.csv,(none),"Family-specific design choices; transcribed from the manuscript (settings, not computed)"
+Table 3,Table03_overall_performance_acc_f1_auc.csv,table1_overall_mean_std.csv,"Overall test performance, Acc/F1(micro)/F1(M)/AUC at 0.5 and tuned thresholds"
+Table 4,Table04_overall_performance_mcc_ece_brier_time.csv,table1_overall_mean_std.csv,"Overall test performance, MCC/ECE/Brier/training time (same source file as Table 3, different columns)"
+Table 5,Table05_per_label_f1.csv,table2_per_label_f1.csv,"Per-label F1, tuned thresholds"
+Table 6,Table06_h1_nested_anova_primary.csv,table_h1_nested_anova_primary_screened.csv,"H1 primary test: nested ANOVA, duplicate-screened 61,701-comment set"
+Table 6 (secondary),Table06_h1_welch_permutation_secondary.csv,table_h1_family_comparison.csv,"H1 secondary test: Welch t-test + exact permutation, full 63,662-comment set (source: results_proposed/report/table_h1_family_comparison.csv, not in results_v2/)"
+Table 7,Table07_h3_benchmark_tuned.csv,table_h3_vs_maslej_tuned.csv,"H3a/H3b vs. published benchmark, tuned comparator"
+Table 8,Table08_h7_per_bin_nested_anova.csv,table_h7_length_control_nested_anova.csv,"H7 per-length-bin nested ANOVA, F1(M) and ROC-AUC"
+Table 9,Table09_h8_brier_skill_score.csv,table_e1_prevalence_normalized_calibration.csv,H8 Brier Skill Score by model and minority label
+Table 10,(no CSV),(none),Outcome synthesis table (collects H1-H10 verdicts from Tables 3-9 and A3-A14; no separate source CSV)
+Table A1,TableA01_hyperparameters.csv,(none),"Full training hyperparameters; transcribed from the manuscript (settings, not computed)"
+Table A2,TableA02_environment.csv,(none),"Hardware/software environment; transcribed from the manuscript (settings, not computed)"
+Table A3,TableA03_benchmark_48row_full.csv,table_a3_corrected_48row.csv,"Full 48-row benchmark comparison, pooled 48-test Holm correction"
+Table A4,TableA04_tukey_hsd_roc_auc.csv,table_h2_tukey_hsd_auc.csv,"Tukey HSD, macro ROC-AUC, 9 cross-family pairs"
+Table A5,TableA05_tukey_hsd_f1m.csv,table_h2_tukey_hsd_f1m.csv,"Tukey HSD, macro F1(M) (secondary), 9 cross-family pairs"
+Table A6,TableA06_delong_median.csv,table_h2_delong_summary.csv,"DeLong's test (corrected, grouped-midrank), median p across labels/seeds"
+Table A7,TableA07_delong_fisher_combined.csv,table_a7_delong_fisher_corrected.csv,"DeLong's test (corrected), Fisher-combined across all 18 p-values per pair"
+Table A8,TableA08_paired_bootstrap.csv,table_h2_bootstrap_reused.csv,"Paired bootstrap, macro ROC-AUC, 9 cross-family pairs"
+Table A9,TableA09_tuned_thresholds.csv,table6_thresholds.csv,Validation-tuned per-label decision thresholds
+Table A10,TableA10_per_label_margin_vs_benchmark.csv,table8_per_label_vs_maslej.csv,"Full per-label margin over the published benchmark, tuned thresholds"
+Table A11,TableA11_h8_adaptive_binning_retest.csv,table_h8_adaptive_binning_retest.csv,"H8 retested with equal-mass (adaptive) ECE binning (source: results_proposed/report/table_h8_adaptive_binning_retest.csv, not in results_v2/)"
+Table A12,TableA12_h5_single_vs_multi_seed.csv,table_h5_single_vs_multi_seed.csv,"H5 single-seed vs. multi-seed significance, per pair-label (McNemar+Fisher)"
+Table A12 (permutation),TableA12_h5_paired_permutation.csv,table_h5_paired_permutation.csv,"H5 paired permutation test (robustness check), per pair-label"
+Table A13,TableA13_h9_cv_ratios.csv,table_h9_cv_ratios.csv,H9 exact per-model seed-sensitivity CV ratios
+Table A14,TableA14_h10_truncation.csv,table_truncation_mismatch.csv,H10 truncation mismatch: word/subword budget coverage

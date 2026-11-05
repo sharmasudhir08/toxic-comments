@@ -1,63 +1,90 @@
 # toxic-comments
 
-Code and results for a manuscript comparing six models — LSTM, Bi-LSTM, GRU
+Reviewer-verification package for a manuscript comparing six models — LSTM, Bi-LSTM, GRU
 (recurrent) and BERT, DistilBERT, RoBERTa (transformer) — on multi-label toxic comment
-classification, using the Jigsaw Toxic Comment Classification Challenge dataset. Three random
-seeds per model. Licensed under Apache License 2.0.
+classification, using the official Jigsaw Toxic Comment Classification Challenge dataset. Three
+random seeds per model. Licensed under Apache License 2.0.
 
-## Results at a glance
+## Purpose
 
-Tuned-threshold, mean ± SD over 3 seeds (full table with all 16 metrics and the default-threshold
-rows: `tables/table1_overall_mean_std.csv`):
+This repository lets a reviewer check every number reported in the paper against its source: the
+statistical test script that computed it, run on the authors' saved model outputs. It is **not**
+a training repository — no dataset, no model checkpoints and no saved predictions are included
+(see "Saved model outputs" below). Nothing here needs to be retrained to verify a number; every
+script in `src/` reads already-computed, saved artifacts.
 
-| Model | F1 (macro, M) | ROC-AUC (macro) | MCC (macro) | Train min/run |
-|---|---|---|---|---|
-| LSTM | 0.5738 ± 0.0036 | 0.9789 ± 0.0027 | 0.5667 ± 0.0093 | 6.7 |
-| Bi-LSTM | 0.5849 ± 0.0088 | 0.9800 ± 0.0018 | 0.5767 ± 0.0055 | 8.0 |
-| GRU | 0.5831 ± 0.0075 | 0.9800 ± 0.0014 | 0.5727 ± 0.0081 | 5.7 |
-| BERT | 0.6235 ± 0.0053 | 0.9825 ± 0.0019 | 0.6141 ± 0.0013 | 76.2 |
-| DistilBERT | 0.6226 ± 0.0063 | 0.9840 ± 0.0007 | 0.6135 ± 0.0024 | 60.2 |
-| RoBERTa | 0.6144 ± 0.0015 | 0.9827 ± 0.0009 | 0.6054 ± 0.0006 | 73.0 |
+## Test sets
 
-## Verifying the paper's numbers
+- **63,662 comments** — the official Jigsaw scored test set (63,978 comments) after removing 316
+  comments of two words or fewer (the short-comment screen, applied before training). This is the
+  test set used for every reported result except H1's primary test.
+- **61,701 comments** — the above set, additionally screened for near-duplicates of the training
+  set (TF-IDF cosine similarity ≥ 0.9; 1,961 comments removed). Used **only** for H1's primary
+  nested-ANOVA test (pre-registered as primary for the family-level comparison specifically); H1's
+  secondary test and H2–H10 use the full 63,662-comment set.
 
-Every table, figure, and statistic reported in the manuscript traces to a file in this repository.
-`TRACEABILITY.md` maps each manuscript claim to its source file, so anyone can check any number
-without retraining anything. File integrity can be checked against `SHASUMS`
-(`sha256sum -c SHASUMS`).
+## Hypotheses and which script tests each
 
-**Example — verifying the H8 calibration claim** (minority labels are better-calibrated than
-frequent labels, for every model): run `python -m src.calibration_analysis` from the repository
-root, against the saved per-seed outputs. Its printed Holm-corrected p-values should match
-`tables/table_h8_calibration_equal_width_console_log.txt` exactly, and its summary numbers match
-`tables/table_h8_calibration_equal_width.csv`. The same pattern (run the named script in `src/`,
-compare its output against the matching file in `tables/`) applies to every other claim listed in
-`TRACEABILITY.md`.
+| Hyp. | What it tests | Script(s) in `src/` |
+|---|---|---|
+| H1 (primary) | Transformers vs. recurrent, family level, nested ANOVA, screened set (61,701) | `h1_nested_anova_paper3.py` |
+| H1 (secondary) | Same, Welch's t-test + exact permutation, full set (63,662) | `family_comparison.py` |
+| H2 | Pairwise cross-family, Tukey HSD + Holm (primary), DeLong's test, paired bootstrap | `h2_full_methods.py`, `h2_delong_fisher_corrected.py` (Fisher-combined robustness check) |
+| H3a/H3b | vs. published benchmark (Maslej-Kresnakova et al. 2020), tuned and untuned comparators, pooled 48-test Holm correction | `h3_h4_paper3.py`, `generate_results.py` |
+| H4 | Minority- vs. frequent-label margin over the benchmark | `h3_h4_paper3.py`, `generate_results.py` |
+| H5 | Single-seed vs. multi-seed significance (McNemar + Fisher), paired permutation robustness check | `single_vs_multi_seed.py` |
+| H6 | Family-level calibration (ECE) + training-cost ratio | `h1_nested_anova_paper3.py` (ECE row), `generate_results.py` (training time) |
+| H7 | Length-bin robustness, per-bin nested ANOVA | `h7_length_control_nested_anova_paper3.py` (Holm correction over the 10 tests: see "Honest gaps" in `TRACEABILITY.md`) |
+| H8 (post-hoc) | Minority-vs-frequent raw ECE (paired t-test) and Brier Skill Score | `h8_raw_ece_paired_ttest_save.py`, `e1_prevalence_normalized_calibration_paper3.py`, `calibration_adaptive_binning.py` (adaptive-binning retest) |
+| H9 (post-hoc) | Seed-sensitivity (coefficient of variation) of calibration vs. discrimination metrics | `seed_stability.py` |
+| H10 (post-hoc) | Word/subword truncation mismatch at the 128-unit budget | `check_truncation_mismatch_paper3.py` |
 
-## Layout
+Every hypothesis's pre-registered or post-hoc wording is given in full in the manuscript, Sec. 1.4
+and 1.4b.
 
-- `src/` — data loading/preprocessing, model training (recurrent and transformer pipelines), and
-  every statistical analysis script used in the paper (significance testing, calibration,
-  seed-stability, length-robustness).
-- `tables/` — every result CSV and the raw console-log text for analyses that otherwise only
-  print to screen, kept here so each number has a saved, checkable source.
-- `figures/` — the architecture diagrams and result figures used in the manuscript, at the
-  resolution submitted.
-- `TRACEABILITY.md` — the manuscript-claim-to-file map described above.
+## Verifying a number
+
+1. Find the number in `results/MAPPING.csv` (paper item → result file → source CSV name).
+2. Run the matching script from this repository's root (see table above), against the saved
+   outputs you have been given access to (see below).
+3. Compare its printed or saved output to `results/<FileName>.csv`.
+
+## Saved model outputs
+
+Saved model outputs (per-model, per-seed test-set probabilities, and the near-duplicate screen
+mask used for H1) are **not included in this repository** to keep it small and because they are
+derived from licensed Kaggle data. They are **available from the authors on reasonable request**.
+With them in place (see each script's own docstring for the expected path), every script in
+`src/` reproduces its result file exactly, with no training or new inference.
 
 ## Reproduction
 
 1. Install dependencies: `pip install -r requirements.txt`.
-2. Download the Jigsaw Toxic Comment Classification Challenge dataset from Kaggle and place
-   `train.csv`, `test.csv`, `test_labels.csv` in `data/` (not included in this repository; see
-   Kaggle's terms).
-3. Train: recurrent models via `python -m src.rnn_proposed`, transformer models via
-   `python -m src.run_experiments` (3 seeds each, both families).
-4. Run the analysis scripts in `src/` (e.g. `src.calibration_analysis`, `src.length_robustness`,
-   `src.h2_full_methods`) against the saved per-seed outputs to regenerate every table in
-   `tables/`.
+2. Download the official Jigsaw Toxic Comment Classification Challenge dataset from Kaggle
+   (`train.csv`, `test.csv`, `test_labels.csv`) — needed only if you want to re-derive the
+   near-duplicate/short-comment screens or the length/truncation statistics from raw text; most
+   statistical tests need only the saved model outputs above.
+3. Obtain the saved model outputs from the authors (see above) and place them at the path each
+   script expects.
+4. Run `python generate_results.py --results_dir results_proposed` for the overall-performance,
+   per-label and benchmark-margin tables, or any individual script in `src/` listed above for a
+   specific hypothesis.
+
+## Layout
+
+- `src/` — the statistical analysis and significance-test scripts behind every reported number,
+  plus the small shared utilities they import (`config.py`, `data.py`, `metrics.py`,
+  `preprocessing.py`, `model_registry.py`, `maslej_baselines.py`, `paper_baselines.py`,
+  `text_cleaning.py`). No training code.
+- `generate_results.py` — produces the overall-performance, per-label and (untuned) benchmark
+  tables from saved per-run metrics.
+- `results/` — every result CSV behind the paper's tables, named by final table number, plus
+  `MAPPING.csv` (paper item → file → source).
+- `figures/` — the six figures as they appear in the final manuscript, extracted directly from it.
+- `TRACEABILITY.md` — table/figure number → result file → script.
 
 ## Not included
 
-The dataset itself is not redistributed (download separately from Kaggle). A Python virtual
-environment is not included; regenerate it from `requirements.txt`.
+The dataset, model checkpoints, saved predictions, and the manuscript file itself (`.docx`/`.docm`)
+are not included. Figure-generation and manuscript-preparation scripts are intentionally excluded
+from this reviewer-check package (statistical-analysis scripts only).

@@ -1,8 +1,0 @@
-transformer
-  BERT (tuned): minority_mean=0.0147  frequent_mean=-0.0091
-  DistilBERT (tuned): minority_mean=0.0288  frequent_mean=-0.0137
-  RoBERTa (tuned): minority_mean=0.0066  frequent_mean=-0.0131
-recurrent
-  LSTM (tuned): minority_mean=0.0179  frequent_mean=-0.0252
-  Bi-LSTM (tuned): minority_mean=0.0338  frequent_mean=-0.0220
-  GRU (tuned): minority_mean=0.0291  frequent_mean=-0.0231
